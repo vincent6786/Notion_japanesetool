@@ -3,20 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Japanese Study Dojo v2</title>
+    <title>Pilot Japanese Dojo</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
     <style>
         :root {
-            --primary: #ff6f91;
-            --secondary: #ff9671;
-            --bg: #fff5f8;
-            --text: #2c3e50;
-            --card-bg: #ffffff;
+            /* Airline Theme Colors */
+            --primary: #0078D7;
+            --primary-dark: #005a9e;
+            --accent: #00C851; /* Success Green */
+            --bg: #f0f2f5;
+            --surface: #ffffff;
+            --text-main: #2c3e50;
+            --text-sub: #607d8b;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
-            color: var(--text);
+            color: var(--text-main);
             margin: 0;
             display: flex;
             flex-direction: column;
@@ -24,71 +28,69 @@
             min-height: 100vh;
         }
 
+        /* --- HEADER --- */
         header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             width: 100%;
             padding: 1.5rem 0;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
+        h1 { margin: 0; font-size: 1.6rem; letter-spacing: 1px; }
+        .subtitle { font-size: 0.9rem; opacity: 0.9; margin-top: 5px; }
 
-        h1 { margin: 0; font-size: 1.8rem; }
-        p.subtitle { margin: 5px 0 0; opacity: 0.9; }
-
+        /* --- NAVIGATION --- */
         nav {
             margin: 20px 0;
             display: flex;
-            gap: 10px;
-            background: white;
-            padding: 5px;
-            border-radius: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            flex-wrap: wrap;
-            justify-content: center;
+            gap: 8px;
+            background: var(--surface);
+            padding: 6px;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
         button.nav-btn {
             border: none;
             background: transparent;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 10px 24px;
+            border-radius: 40px;
             cursor: pointer;
-            font-weight: bold;
-            color: #777;
-            transition: 0.3s;
+            font-weight: 600;
+            color: var(--text-sub);
+            transition: all 0.2s ease;
         }
 
+        button.nav-btn:hover { background-color: #f8f9fa; }
         button.nav-btn.active {
             background-color: var(--primary);
             color: white;
+            box-shadow: 0 2px 8px rgba(0,120,215,0.4);
         }
 
-        .section { display: none; width: 90%; max-width: 600px; padding-bottom: 50px; }
-        .section.active { display: block; animation: fadeIn 0.5s; }
+        /* --- MAIN SECTIONS --- */
+        .section { display: none; width: 90%; max-width: 500px; padding-bottom: 60px; animation: slideUp 0.4s ease-out; }
+        .section.active { display: block; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Kana Grid */
-        .kana-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            gap: 10px;
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(15px); } 
+            to { opacity: 1; transform: translateY(0); } 
         }
-        .kana-box {
-            background: white;
-            padding: 15px 5px;
+
+        /* --- COMPONENTS --- */
+        .card-box {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
             text-align: center;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .char { font-size: 1.5rem; display: block; color: var(--primary); }
-        .romaji { font-size: 0.8rem; color: #888; }
 
-        /* Flashcards */
-        .flashcard-container {
+        /* Flashcard Specifics */
+        .flashcard-wrapper {
             perspective: 1000px;
-            height: 300px;
+            height: 320px;
             cursor: pointer;
             margin-bottom: 20px;
         }
@@ -96,11 +98,11 @@
             position: relative;
             width: 100%;
             height: 100%;
-            text-align: center;
-            transition: transform 0.6s;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
             transform-style: preserve-3d;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            background: var(--surface);
         }
         .flashcard.flipped { transform: rotateY(180deg); }
         .card-face {
@@ -112,353 +114,341 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border-radius: 15px;
-            background: white;
-            border: 2px solid var(--primary);
-        }
-        .card-front { background: white; }
-        .card-back { transform: rotateY(180deg); background: var(--bg); }
-        .big-text { font-size: 4rem; margin: 0; }
-        .medium-text { font-size: 1.5rem; color: #555; }
-        .small-text { font-size: 1rem; color: #888; margin-top: 10px; }
-
-        .controls { display: flex; justify-content: center; gap: 20px; }
-        .action-btn {
-            background: var(--text);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .action-btn:hover { background: #444; }
-
-        /* Quiz */
-        .quiz-box {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .option-btn {
-            background: #f0f0f0;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-        }
-        .option-btn.correct { background: #4caf50; color: white; }
-        .option-btn.wrong { background: #f44336; color: white; }
-        
-        /* Manager */
-        .manager-box {
-            background: white;
+            border-radius: 20px;
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-sizing: border-box;
         }
-        .input-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-        .input-group label { display: block; font-size: 0.9rem; margin-bottom: 5px; color: #666; }
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box; /* Fix padding width issue */
-        }
-        .btn-primary {
-            background: var(--primary);
+        .card-front { background: var(--surface); }
+        .card-back { transform: rotateY(180deg); background: #f8fbff; border: 2px solid var(--primary); }
+        
+        .jp-text { font-size: 3.5rem; margin: 0; color: var(--text-main); }
+        .kana-text { font-size: 1.2rem; color: var(--text-sub); margin-top: 5px; }
+        .en-text { font-size: 2rem; font-weight: bold; color: var(--primary); }
+        .romaji-text { font-size: 1rem; color: var(--text-sub); margin-top: 10px; font-style: italic; }
+
+        .btn-control {
+            background: var(--text-main);
             color: white;
             border: none;
-            padding: 12px;
-            width: 100%;
-            border-radius: 5px;
+            padding: 12px 24px;
+            border-radius: 12px;
             font-size: 1rem;
             cursor: pointer;
+            transition: 0.2s;
         }
-        .btn-secondary {
-            background: var(--secondary);
-            color: white;
+        .btn-control:hover { background: #1a252f; transform: translateY(-2px); }
+        .controls { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
+
+        /* Quiz Specifics */
+        .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
+        .quiz-btn {
+            background: #f1f3f5;
             border: none;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1rem;
             cursor: pointer;
-            margin-top: 10px;
-            width: 48%;
+            transition: 0.2s;
+            color: var(--text-main);
+            font-weight: 500;
         }
-        .file-controls { display: flex; justify-content: space-between; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;}
-        #file-input { display: none; }
+        .quiz-btn:hover { background: #e9ecef; }
+        .quiz-btn.correct { background: var(--accent); color: white; }
+        .quiz-btn.wrong { background: #ff4444; color: white; }
         
-        /* Stats */
-        .stats-count { text-align: center; margin-bottom: 20px; color: #888; font-size: 0.9rem; }
+        .score-pill {
+            display: inline-block;
+            background: var(--bg);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-top: 15px;
+        }
+
+        /* Settings */
+        .settings-group { margin-bottom: 25px; text-align: left; }
+        .settings-group h3 { margin-bottom: 10px; font-size: 1.1rem; }
+        .input-url {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .input-url:focus { border-color: var(--primary); outline: none; }
+        .btn-sync { width: 100%; background: var(--primary); margin-top: 10px; }
+        .status-msg { margin-top: 10px; font-size: 0.9rem; text-align: center; min-height: 20px; }
+        .status-success { color: var(--accent); font-weight: bold; }
+        .status-error { color: #ff4444; font-weight: bold; }
 
     </style>
 </head>
 <body>
 
 <header>
-    <h1>日本語 Study Dojo</h1>
-    <p class="subtitle">Learn. Quiz. Manage.</p>
+    <h1>PILOT DOJO</h1>
+    <p class="subtitle">Japanese Aviation Vocabulary</p>
 </header>
 
 <nav>
-    <button class="nav-btn active" onclick="showSection('kana')">Kana</button>
-    <button class="nav-btn" onclick="showSection('flashcards')">Flashcards</button>
-    <button class="nav-btn" onclick="showSection('quiz')">Quiz</button>
-    <button class="nav-btn" onclick="showSection('manager')">Manage Data</button>
+    <button class="nav-btn active" onclick="nav('flashcards')">Cards</button>
+    <button class="nav-btn" onclick="nav('quiz')">Quiz</button>
+    <button class="nav-btn" onclick="nav('settings')">Sync</button>
 </nav>
 
-<div id="kana" class="section active">
-    <div class="kana-grid" id="hiragana-grid"></div>
-</div>
-
-<div id="flashcards" class="section">
-    <div class="stats-count">Total Cards: <span id="total-cards-display">0</span></div>
-    <div class="flashcard-container" onclick="flipCard()">
-        <div class="flashcard" id="card-element">
+<div id="flashcards" class="section active">
+    <div style="text-align:right; margin-bottom:10px; font-size:0.85rem; color:#888;">
+        Count: <span id="card-count">0</span>
+    </div>
+    
+    <div class="flashcard-wrapper" onclick="flipCard()">
+        <div class="flashcard" id="card-el">
             <div class="card-face card-front">
-                <span class="small-text">Japanese</span>
-                <h2 class="big-text" id="fc-jp">...</h2>
-                <p class="medium-text" id="fc-kana">...</p>
+                <span style="font-size:0.8rem; color:#aaa; text-transform:uppercase; letter-spacing:1px; margin-bottom:20px;">Term</span>
+                <h2 class="jp-text" id="fc-jp">...</h2>
+                <p class="kana-text" id="fc-kana">Loading...</p>
+                <div style="margin-top:40px; font-size:0.8rem; color:#ccc;">Tap to flip</div>
             </div>
             <div class="card-face card-back">
-                <span class="small-text">Meaning</span>
-                <h2 class="medium-text" id="fc-en">...</h2>
-                <p class="small-text" id="fc-romaji">...</p>
+                <span style="font-size:0.8rem; color:#aaa; text-transform:uppercase; letter-spacing:1px; margin-bottom:20px;">Meaning</span>
+                <div class="en-text" id="fc-en">...</div>
+                <div class="romaji-text" id="fc-romaji">...</div>
             </div>
         </div>
     </div>
+
     <div class="controls">
-        <button class="action-btn" onclick="prevCard()">← Prev</button>
-        <button class="action-btn" onclick="nextCard()">Next →</button>
+        <button class="btn-control" onclick="moveCard(-1)">← Prev</button>
+        <button class="btn-control" onclick="moveCard(1)">Next →</button>
     </div>
 </div>
 
 <div id="quiz" class="section">
-    <div class="quiz-box">
-        <p>What is the meaning of:</p>
-        <h1 class="big-text" id="quiz-question">...</h1>
-        <div class="options-grid" id="quiz-options"></div>
-        <div style="margin-top:20px; font-weight:bold; color:var(--primary);" id="score-display">Score: 0</div>
-        <button class="action-btn" style="margin-top:20px; display:none;" id="next-q-btn" onclick="loadQuiz()">Next Question</button>
+    <div class="card-box">
+        <p style="color:#888; margin-bottom:5px;">What does this mean?</p>
+        <h2 style="font-size:2.5rem; margin:10px 0; color:var(--primary);" id="q-jp">...</h2>
+        
+        <div class="quiz-options" id="q-options">
+            </div>
+
+        <div class="score-pill" id="score-display">Score: 0</div>
+        
+        <button id="next-q-btn" class="btn-control" style="width:100%; margin-top:20px; background:var(--accent); display:none;" onclick="initQuiz()">Next Question</button>
     </div>
 </div>
 
-<div id="manager" class="section">
-    <div class="manager-box">
-        <h3 style="margin-top:0;">Add New Word</h3>
-        <div class="input-group">
-            <label>Kanji / Word</label>
-            <input type="text" id="input-jp" placeholder="e.g. 飛行機">
+<div id="settings" class="section">
+    <div class="card-box">
+        <div class="settings-group">
+            <h3>☁️ Google Sheets Sync</h3>
+            <p style="font-size:0.85rem; color:#666; margin-bottom:10px;">
+                Paste your Web App URL below to sync vocabulary.
+            </p>
+            <input type="text" id="api-url" class="input-url" placeholder="https://script.google.com/macros/s/..." onchange="saveUrl()">
+            <button class="btn-control btn-sync" onclick="fetchData()">Sync Now</button>
+            <div id="sync-status" class="status-msg"></div>
         </div>
-        <div class="input-group">
-            <label>Hiragana Reading</label>
-            <input type="text" id="input-kana" placeholder="e.g. ひこうき">
-        </div>
-        <div class="input-group">
-            <label>English Meaning</label>
-            <input type="text" id="input-en" placeholder="e.g. Airplane">
-        </div>
-        <div class="input-group">
-            <label>Romaji</label>
-            <input type="text" id="input-romaji" placeholder="e.g. Hikouki">
-        </div>
-        <button class="btn-primary" onclick="addNewWord()">Add to Deck</button>
 
-        <div class="file-controls">
-            <button class="btn-secondary" onclick="exportData()">💾 Export Backup</button>
-            <button class="btn-secondary" onclick="document.getElementById('file-input').click()">📂 Import Backup</button>
-            <input type="file" id="file-input" accept=".json" onchange="importData(this)">
+        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+
+        <div class="settings-group">
+            <h3>💾 Backup Data</h3>
+            <div style="display:flex; gap:10px;">
+                <button class="quiz-btn" style="flex:1; padding:10px;" onclick="exportJson()">Export JSON</button>
+                <button class="quiz-btn" style="flex:1; padding:10px;" onclick="document.getElementById('file-in').click()">Import JSON</button>
+            </div>
+            <input type="file" id="file-in" style="display:none" accept=".json" onchange="importJson(this)">
         </div>
-        <p style="font-size:0.8rem; color:#888; margin-top:10px;">
-            * To save to Google Drive: Click "Export Backup", then drag the downloaded file into your Google Drive folder.
-        </p>
+    </div>
+    
+    <div style="margin-top:20px; text-align:center; font-size:0.8rem; color:#aaa;">
+        Pilot Dojo v2.0
     </div>
 </div>
 
 <script>
-    // --- DATA ---
-    const hiraganaData = [
-        {char:'あ', r:'a'}, {char:'い', r:'i'}, {char:'う', r:'u'}, {char:'え', r:'e'}, {char:'お', r:'o'},
-        {char:'か', r:'ka'}, {char:'き', r:'ki'}, {char:'く', r:'ku'}, {char:'け', r:'ke'}, {char:'こ', r:'ko'},
-        {char:'さ', r:'sa'}, {char:'し', r:'shi'}, {char:'す', r:'su'}, {char:'せ', r:'se'}, {char:'そ', r:'so'},
-        {char:'た', r:'ta'}, {char:'ち', r:'chi'}, {char:'つ', r:'tsu'}, {char:'て', r:'te'}, {char:'と', r:'to'},
-        {char:'な', r:'na'}, {char:'に', r:'ni'}, {char:'ぬ', r:'nu'}, {char:'ね', r:'ne'}, {char:'の', r:'no'},
-        {char:'は', r:'ha'}, {char:'ひ', r:'hi'}, {char:'ふ', r:'fu'}, {char:'へ', r:'he'}, {char:'ほ', r:'ho'},
-        {char:'ま', r:'ma'}, {char:'み', r:'mi'}, {char:'む', r:'mu'}, {char:'め', r:'me'}, {char:'も', r:'mo'},
-        {char:'や', r:'ya'}, {char:'ゆ', r:'yu'}, {char:'よ', r:'yo'},
-        {char:'ら', r:'ra'}, {char:'り', r:'ri'}, {char:'る', r:'ru'}, {char:'れ', r:'re'}, {char:'ろ', r:'ro'},
-        {char:'わ', r:'wa'}, {char:'を', r:'wo'}, {char:'ん', r:'n'}
-    ];
+    // --- STATE MANAGEMENT ---
+    let vocab = [];
+    let curIdx = 0;
+    let score = 0;
+    let currentQ = null;
 
-    // Default data
-    let vocabData = [
-        { jp: '猫', kana: 'ねこ', en: 'Cat', romaji: 'Neko' },
-        { jp: '犬', kana: 'いぬ', en: 'Dog', romaji: 'Inu' },
-        { jp: '水', kana: 'みず', en: 'Water', romaji: 'Mizu' },
-        { jp: '食べる', kana: 'たべる', en: 'To Eat', romaji: 'Taberu' },
-        { jp: '本', kana: 'ほん', en: 'Book', romaji: 'Hon' }
-    ];
+    // Load saved data on startup
+    window.onload = () => {
+        const savedVocab = localStorage.getItem('pilot_vocab');
+        const savedUrl = localStorage.getItem('pilot_url');
+        
+        if (savedUrl) document.getElementById('api-url').value = savedUrl;
+        
+        if (savedVocab) {
+            vocab = JSON.parse(savedVocab);
+        } else {
+            // Default starter data (Aviation Themed)
+            vocab = [
+                { jp: '滑走路', kana: 'かっそうろ', en: 'Runway', romaji: 'Kassouro' },
+                { jp: '離陸', kana: 'りりく', en: 'Takeoff', romaji: 'Ririku' },
+                { jp: '着陸', kana: 'ちゃくりく', en: 'Landing', romaji: 'Chakuriku' },
+                { jp: '管制塔', kana: 'かんせいとう', en: 'Control Tower', romaji: 'Kanseitou' }
+            ];
+        }
+        updateUI();
+    };
 
     // --- NAVIGATION ---
-    function showSection(id) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    function nav(id) {
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         event.target.classList.add('active');
         
-        // Refresh views if switching tabs
-        if(id === 'flashcards') updateCard();
-        if(id === 'quiz') loadQuiz();
+        if (id === 'flashcards') updateCard();
+        if (id === 'quiz') initQuiz();
     }
-
-    // --- KANA GRID ---
-    const grid = document.getElementById('hiragana-grid');
-    hiraganaData.forEach(item => {
-        grid.innerHTML += `<div class="kana-box"><span class="char">${item.char}</span><span class="romaji">${item.r}</span></div>`;
-    });
 
     // --- FLASHCARDS ---
-    let currentCardIndex = 0;
-    const cardEl = document.getElementById('card-element');
-    const jpEl = document.getElementById('fc-jp');
-    const kanaEl = document.getElementById('fc-kana');
-    const enEl = document.getElementById('fc-en');
-    const romajiEl = document.getElementById('fc-romaji');
-
-    function updateCard() {
-        if(vocabData.length === 0) return;
-        const data = vocabData[currentCardIndex];
-        jpEl.innerText = data.jp;
-        kanaEl.innerText = data.kana;
-        enEl.innerText = data.en;
-        romajiEl.innerText = data.romaji;
-        cardEl.classList.remove('flipped');
-        document.getElementById('total-cards-display').innerText = vocabData.length;
+    function updateUI() {
+        document.getElementById('card-count').innerText = vocab.length;
+        updateCard();
     }
 
-    function flipCard() { cardEl.classList.toggle('flipped'); }
-    function nextCard() { currentCardIndex = (currentCardIndex + 1) % vocabData.length; updateCard(); }
-    function prevCard() { currentCardIndex = (currentCardIndex - 1 + vocabData.length) % vocabData.length; updateCard(); }
+    function updateCard() {
+        if (vocab.length === 0) return;
+        const item = vocab[curIdx];
+        document.getElementById('fc-jp').innerText = item.jp;
+        document.getElementById('fc-kana').innerText = item.kana;
+        document.getElementById('fc-en').innerText = item.en;
+        document.getElementById('fc-romaji').innerText = item.romaji;
+        document.getElementById('card-el').classList.remove('flipped');
+    }
 
-    // --- QUIZ ---
-    let score = 0;
-    let currentQuestion = {};
+    function flipCard() {
+        document.getElementById('card-el').classList.toggle('flipped');
+    }
 
-    function loadQuiz() {
-        if(vocabData.length < 4) {
-            document.getElementById('quiz-question').innerText = "Add more words!";
-            document.getElementById('quiz-options').innerHTML = "<p>You need at least 4 words to play.</p>";
+    function moveCard(dir) {
+        curIdx = (curIdx + dir + vocab.length) % vocab.length;
+        updateCard();
+    }
+
+    // --- QUIZ LOGIC ---
+    function initQuiz() {
+        if (vocab.length < 4) {
+            document.getElementById('q-jp').innerText = "Need more words!";
+            document.getElementById('q-options').innerHTML = "<small>Add at least 4 words in Settings.</small>";
             return;
         }
-
+        
         document.getElementById('next-q-btn').style.display = 'none';
-        const correctIndex = Math.floor(Math.random() * vocabData.length);
-        currentQuestion = vocabData[correctIndex];
-        document.getElementById('quiz-question').innerText = currentQuestion.jp;
+        
+        // Pick question
+        const qIdx = Math.floor(Math.random() * vocab.length);
+        currentQ = vocab[qIdx];
+        document.getElementById('q-jp').innerText = currentQ.jp;
 
-        let options = [currentQuestion];
-        while (options.length < 4) {
-            let randomItem = vocabData[Math.floor(Math.random() * vocabData.length)];
-            if (!options.includes(randomItem)) options.push(randomItem);
+        // Pick distractors
+        let opts = [currentQ];
+        while(opts.length < 4) {
+            let r = vocab[Math.floor(Math.random() * vocab.length)];
+            if (!opts.includes(r)) opts.push(r);
         }
-        options.sort(() => Math.random() - 0.5);
+        // Shuffle
+        opts.sort(() => Math.random() - 0.5);
 
-        const optionsContainer = document.getElementById('quiz-options');
-        optionsContainer.innerHTML = '';
-        options.forEach(opt => {
+        // Render
+        const container = document.getElementById('q-options');
+        container.innerHTML = '';
+        opts.forEach(opt => {
             const btn = document.createElement('button');
-            btn.className = 'option-btn';
+            btn.className = 'quiz-btn';
             btn.innerText = opt.en;
-            btn.onclick = () => checkAnswer(opt, btn);
-            optionsContainer.appendChild(btn);
+            btn.onclick = (e) => handleAnswer(opt, e.target);
+            container.appendChild(btn);
         });
     }
 
-    function checkAnswer(selected, btnElement) {
-        document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
-        if (selected.jp === currentQuestion.jp) {
-            btnElement.classList.add('correct');
-            score++;
+    function handleAnswer(selected, btn) {
+        // Disable all
+        document.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+        
+        if (selected.jp === currentQ.jp) {
+            btn.classList.add('correct');
+            score += 10;
             document.getElementById('score-display').innerText = `Score: ${score}`;
         } else {
-            btnElement.classList.add('wrong');
-            document.querySelectorAll('.option-btn').forEach(b => {
-                if(b.innerText === currentQuestion.en) b.classList.add('correct');
+            btn.classList.add('wrong');
+            // Highlight correct
+            document.querySelectorAll('.quiz-btn').forEach(b => {
+                if (b.innerText === currentQ.en) b.classList.add('correct');
             });
         }
-        document.getElementById('next-q-btn').style.display = 'inline-block';
+        document.getElementById('next-q-btn').style.display = 'block';
     }
 
-    // --- DATA MANAGEMENT ---
-    function addNewWord() {
-        const jp = document.getElementById('input-jp').value;
-        const kana = document.getElementById('input-kana').value;
-        const en = document.getElementById('input-en').value;
-        const romaji = document.getElementById('input-romaji').value;
+    // --- SYNC & DATA ---
+    function saveUrl() {
+        localStorage.setItem('pilot_url', document.getElementById('api-url').value);
+    }
 
-        if(jp && en) {
-            vocabData.push({ jp, kana, en, romaji });
-            alert(`Added: ${jp}`);
-            // Clear inputs
-            document.getElementById('input-jp').value = '';
-            document.getElementById('input-kana').value = '';
-            document.getElementById('input-en').value = '';
-            document.getElementById('input-romaji').value = '';
-            updateCard(); // refresh flashcard view
-        } else {
-            alert("Please enter at least the Word and Meaning.");
+    async function fetchData() {
+        const url = document.getElementById('api-url').value;
+        const status = document.getElementById('sync-status');
+        
+        if (!url) {
+            status.innerText = "Please enter a URL first.";
+            return;
+        }
+
+        status.innerText = "Connecting to Google...";
+        status.className = "status-msg";
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            
+            if (data.error) throw new Error(data.error);
+            if (!Array.isArray(data)) throw new Error("Invalid data format");
+
+            vocab = data;
+            localStorage.setItem('pilot_vocab', JSON.stringify(vocab));
+            curIdx = 0;
+            updateUI();
+            
+            status.innerText = `Success! Loaded ${vocab.length} words.`;
+            status.className = "status-msg status-success";
+        } catch (err) {
+            console.error(err);
+            status.innerText = "Sync Failed. Check URL & permissions.";
+            status.className = "status-msg status-error";
         }
     }
 
-    function exportData() {
-        const dataStr = JSON.stringify(vocabData, null, 2);
-        const blob = new Blob([dataStr], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = "japanese_study_data.json";
-        a.click();
-        URL.revokeObjectURL(url);
+    function exportJson() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(vocab, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "pilot_vocab.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
     }
 
-    function importData(input) {
+    function importJson(input) {
         const file = input.files[0];
-        if(!file) return;
-
+        if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = (e) => {
             try {
-                const loadedData = JSON.parse(e.target.result);
-                if(Array.isArray(loadedData)) {
-                    vocabData = loadedData;
-                    alert("Data loaded successfully!");
-                    currentCardIndex = 0;
-                    updateCard();
-                } else {
-                    alert("Invalid file format.");
-                }
-            } catch(err) {
-                alert("Error reading file.");
-            }
+                vocab = JSON.parse(e.target.result);
+                localStorage.setItem('pilot_vocab', JSON.stringify(vocab));
+                updateUI();
+                alert("Imported successfully!");
+            } catch (err) { alert("Invalid file"); }
         };
         reader.readAsText(file);
     }
-
-    // Init
-    updateCard();
-
 </script>
 
 </body>
