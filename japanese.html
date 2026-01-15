@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Japanese Study Dojo</title>
+    <title>My Japanese Study Dojo v2</title>
     <style>
         :root {
-            --primary: #ff6f91; /* Sakura Pink */
+            --primary: #ff6f91;
             --secondary: #ff9671;
             --bg: #fff5f8;
             --text: #2c3e50;
@@ -36,7 +36,6 @@
         h1 { margin: 0; font-size: 1.8rem; }
         p.subtitle { margin: 5px 0 0; opacity: 0.9; }
 
-        /* Navigation */
         nav {
             margin: 20px 0;
             display: flex;
@@ -45,6 +44,8 @@
             padding: 5px;
             border-radius: 30px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         button.nav-btn {
@@ -63,8 +64,7 @@
             color: white;
         }
 
-        /* Sections */
-        .section { display: none; width: 90%; max-width: 600px; }
+        .section { display: none; width: 90%; max-width: 600px; padding-bottom: 50px; }
         .section.active { display: block; animation: fadeIn 0.5s; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -81,9 +81,7 @@
             text-align: center;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
         }
-        .kana-box:hover { transform: translateY(-3px); border: 1px solid var(--primary); }
         .char { font-size: 1.5rem; display: block; color: var(--primary); }
         .romaji { font-size: 0.8rem; color: #888; }
 
@@ -94,7 +92,6 @@
             cursor: pointer;
             margin-bottom: 20px;
         }
-
         .flashcard {
             position: relative;
             width: 100%;
@@ -105,9 +102,7 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             border-radius: 15px;
         }
-
         .flashcard.flipped { transform: rotateY(180deg); }
-
         .card-face {
             position: absolute;
             width: 100%;
@@ -121,10 +116,8 @@
             background: white;
             border: 2px solid var(--primary);
         }
-
         .card-front { background: white; }
         .card-back { transform: rotateY(180deg); background: var(--bg); }
-
         .big-text { font-size: 4rem; margin: 0; }
         .medium-text { font-size: 1.5rem; color: #555; }
         .small-text { font-size: 1rem; color: #888; margin-top: 10px; }
@@ -161,13 +154,54 @@
             border-radius: 8px;
             font-size: 1.1rem;
             cursor: pointer;
-            transition: 0.2s;
         }
-        .option-btn:hover { background: #e0e0e0; }
         .option-btn.correct { background: #4caf50; color: white; }
         .option-btn.wrong { background: #f44336; color: white; }
         
-        .score-board { margin-top: 20px; font-weight: bold; color: var(--primary); }
+        /* Manager */
+        .manager-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .input-group label { display: block; font-size: 0.9rem; margin-bottom: 5px; color: #666; }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box; /* Fix padding width issue */
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 48%;
+        }
+        .file-controls { display: flex; justify-content: space-between; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;}
+        #file-input { display: none; }
+        
+        /* Stats */
+        .stats-count { text-align: center; margin-bottom: 20px; color: #888; font-size: 0.9rem; }
 
     </style>
 </head>
@@ -175,32 +209,33 @@
 
 <header>
     <h1>日本語 Study Dojo</h1>
-    <p class="subtitle">Learn Kana & Vocabulary</p>
+    <p class="subtitle">Learn. Quiz. Manage.</p>
 </header>
 
 <nav>
-    <button class="nav-btn active" onclick="showSection('kana')">Kana Chart</button>
+    <button class="nav-btn active" onclick="showSection('kana')">Kana</button>
     <button class="nav-btn" onclick="showSection('flashcards')">Flashcards</button>
     <button class="nav-btn" onclick="showSection('quiz')">Quiz</button>
+    <button class="nav-btn" onclick="showSection('manager')">Manage Data</button>
 </nav>
 
 <div id="kana" class="section active">
-    <h2 style="text-align:center; color: var(--primary);">Hiragana Basic</h2>
     <div class="kana-grid" id="hiragana-grid"></div>
 </div>
 
 <div id="flashcards" class="section">
+    <div class="stats-count">Total Cards: <span id="total-cards-display">0</span></div>
     <div class="flashcard-container" onclick="flipCard()">
         <div class="flashcard" id="card-element">
             <div class="card-face card-front">
                 <span class="small-text">Japanese</span>
-                <h2 class="big-text" id="fc-jp">猫</h2>
-                <p class="medium-text" id="fc-kana">ねこ</p>
+                <h2 class="big-text" id="fc-jp">...</h2>
+                <p class="medium-text" id="fc-kana">...</p>
             </div>
             <div class="card-face card-back">
                 <span class="small-text">Meaning</span>
-                <h2 class="medium-text" id="fc-en">Cat</h2>
-                <p class="small-text" id="fc-romaji">Neko</p>
+                <h2 class="medium-text" id="fc-en">...</h2>
+                <p class="small-text" id="fc-romaji">...</p>
             </div>
         </div>
     </div>
@@ -213,11 +248,42 @@
 <div id="quiz" class="section">
     <div class="quiz-box">
         <p>What is the meaning of:</p>
-        <h1 class="big-text" id="quiz-question">犬</h1>
-        <div class="options-grid" id="quiz-options">
-            </div>
-        <div class="score-board" id="score-display">Score: 0</div>
+        <h1 class="big-text" id="quiz-question">...</h1>
+        <div class="options-grid" id="quiz-options"></div>
+        <div style="margin-top:20px; font-weight:bold; color:var(--primary);" id="score-display">Score: 0</div>
         <button class="action-btn" style="margin-top:20px; display:none;" id="next-q-btn" onclick="loadQuiz()">Next Question</button>
+    </div>
+</div>
+
+<div id="manager" class="section">
+    <div class="manager-box">
+        <h3 style="margin-top:0;">Add New Word</h3>
+        <div class="input-group">
+            <label>Kanji / Word</label>
+            <input type="text" id="input-jp" placeholder="e.g. 飛行機">
+        </div>
+        <div class="input-group">
+            <label>Hiragana Reading</label>
+            <input type="text" id="input-kana" placeholder="e.g. ひこうき">
+        </div>
+        <div class="input-group">
+            <label>English Meaning</label>
+            <input type="text" id="input-en" placeholder="e.g. Airplane">
+        </div>
+        <div class="input-group">
+            <label>Romaji</label>
+            <input type="text" id="input-romaji" placeholder="e.g. Hikouki">
+        </div>
+        <button class="btn-primary" onclick="addNewWord()">Add to Deck</button>
+
+        <div class="file-controls">
+            <button class="btn-secondary" onclick="exportData()">💾 Export Backup</button>
+            <button class="btn-secondary" onclick="document.getElementById('file-input').click()">📂 Import Backup</button>
+            <input type="file" id="file-input" accept=".json" onchange="importData(this)">
+        </div>
+        <p style="font-size:0.8rem; color:#888; margin-top:10px;">
+            * To save to Google Drive: Click "Export Backup", then drag the downloaded file into your Google Drive folder.
+        </p>
     </div>
 </div>
 
@@ -236,39 +302,34 @@
         {char:'わ', r:'wa'}, {char:'を', r:'wo'}, {char:'ん', r:'n'}
     ];
 
-    const vocabData = [
+    // Default data
+    let vocabData = [
         { jp: '猫', kana: 'ねこ', en: 'Cat', romaji: 'Neko' },
         { jp: '犬', kana: 'いぬ', en: 'Dog', romaji: 'Inu' },
         { jp: '水', kana: 'みず', en: 'Water', romaji: 'Mizu' },
         { jp: '食べる', kana: 'たべる', en: 'To Eat', romaji: 'Taberu' },
-        { jp: '本', kana: 'ほん', en: 'Book', romaji: 'Hon' },
-        { jp: '学生', kana: 'がくせい', en: 'Student', romaji: 'Gakusei' },
-        { jp: '先生', kana: 'せんせい', en: 'Teacher', romaji: 'Sensei' },
-        { jp: 'ありがとう', kana: 'ありがとう', en: 'Thank you', romaji: 'Arigatou' },
-        { jp: 'さようなら', kana: 'さようなら', en: 'Goodbye', romaji: 'Sayounara' },
-        { jp: '日本', kana: 'にほん', en: 'Japan', romaji: 'Nihon' }
+        { jp: '本', kana: 'ほん', en: 'Book', romaji: 'Hon' }
     ];
 
-    // --- NAVIGATION LOGIC ---
+    // --- NAVIGATION ---
     function showSection(id) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         event.target.classList.add('active');
+        
+        // Refresh views if switching tabs
+        if(id === 'flashcards') updateCard();
+        if(id === 'quiz') loadQuiz();
     }
 
-    // --- KANA GRID BUILDER ---
+    // --- KANA GRID ---
     const grid = document.getElementById('hiragana-grid');
     hiraganaData.forEach(item => {
-        grid.innerHTML += `
-            <div class="kana-box">
-                <span class="char">${item.char}</span>
-                <span class="romaji">${item.r}</span>
-            </div>
-        `;
+        grid.innerHTML += `<div class="kana-box"><span class="char">${item.char}</span><span class="romaji">${item.r}</span></div>`;
     });
 
-    // --- FLASHCARD LOGIC ---
+    // --- FLASHCARDS ---
     let currentCardIndex = 0;
     const cardEl = document.getElementById('card-element');
     const jpEl = document.getElementById('fc-jp');
@@ -277,59 +338,45 @@
     const romajiEl = document.getElementById('fc-romaji');
 
     function updateCard() {
+        if(vocabData.length === 0) return;
         const data = vocabData[currentCardIndex];
         jpEl.innerText = data.jp;
         kanaEl.innerText = data.kana;
         enEl.innerText = data.en;
         romajiEl.innerText = data.romaji;
         cardEl.classList.remove('flipped');
+        document.getElementById('total-cards-display').innerText = vocabData.length;
     }
 
-    function flipCard() {
-        cardEl.classList.toggle('flipped');
-    }
+    function flipCard() { cardEl.classList.toggle('flipped'); }
+    function nextCard() { currentCardIndex = (currentCardIndex + 1) % vocabData.length; updateCard(); }
+    function prevCard() { currentCardIndex = (currentCardIndex - 1 + vocabData.length) % vocabData.length; updateCard(); }
 
-    function nextCard() {
-        currentCardIndex = (currentCardIndex + 1) % vocabData.length;
-        updateCard();
-    }
-
-    function prevCard() {
-        currentCardIndex = (currentCardIndex - 1 + vocabData.length) % vocabData.length;
-        updateCard();
-    }
-    
-    // Initialize first card
-    updateCard();
-
-    // --- QUIZ LOGIC ---
+    // --- QUIZ ---
     let score = 0;
     let currentQuestion = {};
 
     function loadQuiz() {
+        if(vocabData.length < 4) {
+            document.getElementById('quiz-question').innerText = "Add more words!";
+            document.getElementById('quiz-options').innerHTML = "<p>You need at least 4 words to play.</p>";
+            return;
+        }
+
         document.getElementById('next-q-btn').style.display = 'none';
-        
-        // Pick random word
         const correctIndex = Math.floor(Math.random() * vocabData.length);
         currentQuestion = vocabData[correctIndex];
-        
         document.getElementById('quiz-question').innerText = currentQuestion.jp;
-        
-        // Get distractors
+
         let options = [currentQuestion];
         while (options.length < 4) {
             let randomItem = vocabData[Math.floor(Math.random() * vocabData.length)];
-            if (!options.includes(randomItem)) {
-                options.push(randomItem);
-            }
+            if (!options.includes(randomItem)) options.push(randomItem);
         }
-        
-        // Shuffle options
         options.sort(() => Math.random() - 0.5);
-        
+
         const optionsContainer = document.getElementById('quiz-options');
         optionsContainer.innerHTML = '';
-        
         options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
@@ -340,26 +387,77 @@
     }
 
     function checkAnswer(selected, btnElement) {
-        // Disable all buttons to prevent double guessing
-        const allBtns = document.querySelectorAll('.option-btn');
-        allBtns.forEach(b => b.disabled = true);
-
+        document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
         if (selected.jp === currentQuestion.jp) {
             btnElement.classList.add('correct');
             score++;
             document.getElementById('score-display').innerText = `Score: ${score}`;
         } else {
             btnElement.classList.add('wrong');
-            // Highlight the correct one
-            allBtns.forEach(b => {
+            document.querySelectorAll('.option-btn').forEach(b => {
                 if(b.innerText === currentQuestion.en) b.classList.add('correct');
             });
         }
         document.getElementById('next-q-btn').style.display = 'inline-block';
     }
 
-    // Initialize Quiz
-    loadQuiz();
+    // --- DATA MANAGEMENT ---
+    function addNewWord() {
+        const jp = document.getElementById('input-jp').value;
+        const kana = document.getElementById('input-kana').value;
+        const en = document.getElementById('input-en').value;
+        const romaji = document.getElementById('input-romaji').value;
+
+        if(jp && en) {
+            vocabData.push({ jp, kana, en, romaji });
+            alert(`Added: ${jp}`);
+            // Clear inputs
+            document.getElementById('input-jp').value = '';
+            document.getElementById('input-kana').value = '';
+            document.getElementById('input-en').value = '';
+            document.getElementById('input-romaji').value = '';
+            updateCard(); // refresh flashcard view
+        } else {
+            alert("Please enter at least the Word and Meaning.");
+        }
+    }
+
+    function exportData() {
+        const dataStr = JSON.stringify(vocabData, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = "japanese_study_data.json";
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importData(input) {
+        const file = input.files[0];
+        if(!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const loadedData = JSON.parse(e.target.result);
+                if(Array.isArray(loadedData)) {
+                    vocabData = loadedData;
+                    alert("Data loaded successfully!");
+                    currentCardIndex = 0;
+                    updateCard();
+                } else {
+                    alert("Invalid file format.");
+                }
+            } catch(err) {
+                alert("Error reading file.");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // Init
+    updateCard();
 
 </script>
 
