@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notion Japanese Widget</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Notion-like font and clean scrollbar */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif; background-color: #ffffff; color: #37352f; }
+        .tab-active { border-bottom: 2px solid #37352f; font-weight: 600; color: #37352f; }
+        .tab-inactive { color: #9b9a97; border-bottom: 2px solid transparent; }
+        .tab-inactive:hover { color: #37352f; background-color: #efefef; border-radius: 4px; }
+        /* Hide scrollbar for cleaner look in embed */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="p-4 h-screen flex flex-col">
+
+    <div class="flex items-center border border-gray-300 rounded-md px-3 py-2 shadow-sm mb-4 focus-within:ring-2 focus-within:ring-blue-400">
+        <span class="text-gray-400 mr-2">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search (e.g. 食べる)" class="w-full outline-none text-sm" onkeydown="handleSearch(event)">
+    </div>
+
+    <div id="resultContainer" class="hidden flex-1 flex flex-col">
+        
+        <div class="mb-4">
+            <h1 id="wordDisplay" class="text-3xl font-bold"></h1>
+            <p id="readingDisplay" class="text-lg text-gray-500"></p>
+        </div>
+
+        <div class="flex space-x-4 border-b border-gray-200 text-sm mb-4 select-none">
+            <button onclick="switchTab('translation')" id="tab-translation" class="tab-active pb-2 px-1 transition">Translation</button>
+            <button onclick="switchTab('grammar')" id="tab-grammar" class="tab-inactive pb-2 px-1 transition">Grammar</button>
+            <button onclick="switchTab('usage')" id="tab-usage" class="tab-inactive pb-2 px-1 transition">Usage</button>
+            <button onclick="switchTab('history')" id="tab-history" class="tab-inactive pb-2 px-1 transition">History</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto">
+            
+            <div id="content-translation" class="block">
+                <div class="mb-3">
+                    <span class="text-xs font-bold text-gray-400 uppercase">English</span>
+                    <p id="en-meaning" class="text-base mt-1"></p>
+                </div>
+                <div class="mb-3">
+                    <span class="text-xs font-bold text-gray-400 uppercase">Traditional Chinese (繁體中文)</span>
+                    <p id="zh-meaning" class="text-base mt-1"></p>
+                </div>
+            </div>
+
+            <div id="content-grammar" class="hidden">
+                <div class="bg-gray-50 p-3 rounded-md border border-gray-100">
+                    <p id="grammar-content" class="text-sm leading-relaxed"></p>
+                </div>
+            </div>
+
+            <div id="content-usage" class="hidden">
+                <ul id="usage-list" class="list-disc list-inside text-sm space-y-2"></ul>
+            </div>
+
+            <div id="content-history" class="hidden">
+                 <p id="history-content" class="text-sm text-gray-600 italic"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MOCK DATA GENERATOR
+        // In a real app, you would fetch this from an API.
+        function getMockData(word) {
+            return {
+                word: word,
+                reading: "Taberu (たべる)",
+                en: "To eat",
+                zh: "吃 (chī)",
+                grammar: "Ichidan verb. \nStem: Tabemasu (食べます)\nTe-form: Tabete (食べて)\nTa-form: Tabeta (食べた)\nNegative: Tabenai (食べない)",
+                usage: [
+                    "I eat sushi. (私は寿司を食べます - Watashi wa sushi o tabemasu)",
+                    "Did you eat? (食べましたか？ - Tabemashita ka?)",
+                    "Let's eat! (食べましょう - Tabemashou)"
+                ],
+                history: "Old Japanese 'tabu'. Originally meant 'to bestow' or 'to raise to a high place', implying receiving food from a superior/gods. Evolved into the general word for eating."
+            };
+        }
+
+        // Handle Search (Enter key)
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                const query = document.getElementById('searchInput').value;
+                if(!query) return;
+
+                // Simulate API Call
+                const data = getMockData(query);
+                
+                // Populate Data
+                document.getElementById('wordDisplay').innerText = data.word;
+                document.getElementById('readingDisplay').innerText = data.reading;
+                document.getElementById('en-meaning').innerText = data.en;
+                document.getElementById('zh-meaning').innerText = data.zh;
+                document.getElementById('grammar-content').innerText = data.grammar;
+                document.getElementById('history-content').innerText = data.history;
+
+                // Populate Usage List
+                const usageList = document.getElementById('usage-list');
+                usageList.innerHTML = '';
+                data.usage.forEach(sentence => {
+                    let li = document.createElement('li');
+                    li.innerText = sentence;
+                    usageList.appendChild(li);
+                });
+
+                // Show Container
+                document.getElementById('resultContainer').classList.remove('hidden');
+                
+                // Reset to first tab
+                switchTab('translation');
+            }
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            const tabs = ['translation', 'grammar', 'usage', 'history'];
+            
+            tabs.forEach(t => {
+                // Toggle Button Styles
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tabName) {
+                    btn.classList.remove('tab-inactive');
+                    btn.classList.add('tab-active');
+                } else {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('tab-inactive');
+                }
+
+                // Toggle Content Visibility
+                const content = document.getElementById(`content-${t}`);
+                if (t === tabName) {
+                    content.classList.remove('hidden');
+                    content.classList.add('block');
+                } else {
+                    content.classList.remove('block');
+                    content.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
